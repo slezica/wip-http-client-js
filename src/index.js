@@ -18,7 +18,19 @@ class HttpClient {
   }
 
   async execute(request) {
-    return this._execute(request)
+    let response = null
+
+    try {
+      response = this._execute(request)
+
+    } catch (error) {
+      Object.defineProperty(error, 'request', {value: request, enumerable: false})
+      Object.defineProperty(error, 'response', {value: response, enumerable: false})
+
+      throw error
+    }
+
+    return response
   }
 }
 
@@ -112,48 +124,32 @@ class HttpRetry {
 }
 
 
-class HttpThrow {
+class HttpOnlyOk {
 
   async intercept(request, next) {
     const response = await next(request)
 
-    try {
-      await Promise.resolve(this.maybeThrow(request, response))
-
-    } catch (error) {
-      Object.defineProperty(error, 'request', {value: request, enumerable: false})
-      Object.defineProperty(error, 'response', {value: response, enumerable: false})
-
-      throw error
+    if (response.status !== 200) {
+      throw new Error(`Response had status ${response.status}`)
     }
 
     return response
   }
-
-  async maybeThrow(request, response) {}
 }
 
 
-class HttpOnlyOk extends HttpThrow {
-
-  async maybeThrow(request, response) {
-    if (response.status !== 200) {
-      throw new Error(`Response had status ${response.status}`)
-    }
-  }
-}
-
-
-class HttpThrowPattern extends HttpThrow {
+class HttpThrowPattern {
 
   constructor(pattern) {
-    super()
     this.pattern = pattern.toLowerCase()
     this.next = 0
   }
 
-  async maybeThrow(request, response) {
-    if (this.pattern[this.next++ % this.pattern.length] === 'f') {
+  async intercept(request, next) {
+    if (this.pattern[this.next++ % this.pattern.length] === 's') {
+      return await next(request)
+
+    } else {
       throw new Error("HttpThrowPattern decided to fail this request")
     }
   }
@@ -189,8 +185,13 @@ const httpClient = new HttpClient([
 
 async function test() {
   // await httpClient.request('http://www.google.com')
-  // await httpClient.request('http://www.google.com', {method: 'post'})
-  await httpClient.request('https://fetch.spec.whatwg.org/#terminology-headers')
+  await httpClient.request('http://www.google.com', {method: 'post'})
+  // await httpClient.request('https://fetch.spec.whatwg.org/#terminology-headers')
 }
 
 test().catch(console.error)
+
+
+// HttpProxy
+// HttpPool
+// HttpThrottle
