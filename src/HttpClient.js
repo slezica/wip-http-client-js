@@ -3,14 +3,18 @@ import fetch from 'isomorphic-fetch'
 
 export default class HttpClient {
 
-  constructor(interceptors) {
-    this.interceptors = interceptors
+  constructor(middleware=[]) {
+    this.middleware = middleware
 
-    function addToChain(nextFunc, interceptor) {
-      return (request) => interceptor.intercept(request, nextFunc)
+    // We'll build a function that composes invocations to middleware components
+    // (each component has to call the next). At the end of the calling chain
+    // we'll put the `fetch()` function.
+
+    function addToChain(chain, middlewareInstance) {
+      return (request) => middlewareInstance.intercept(request, chain)
     }
 
-    this._execute = interceptors.reduceRight(addToChain, fetch)
+    this._execute = middleware.reduceRight(addToChain, fetch)
   }
 
   async request(url, options) {
@@ -25,8 +29,6 @@ export default class HttpClient {
 
     } catch (error) {
       Object.defineProperty(error, 'request', {value: request, enumerable: false})
-      Object.defineProperty(error, 'response', {value: response, enumerable: false})
-
       throw error
     }
 

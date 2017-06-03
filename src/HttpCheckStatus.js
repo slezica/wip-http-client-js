@@ -1,10 +1,14 @@
 
-export default class HttpOnlyOk {
+export default class HttpCheckStatus {
+
+  constructor(isValid) {
+    this.isValid = isValid || (status) => (status < 400)
+  }
 
   async intercept(request, next) {
     const response = await next(request)
 
-    if (response.status !== 200) {
+    if (! this.isValid(response.status)) {
       throw new Error(`Response had status ${response.status}`)
     }
 
