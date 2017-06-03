@@ -2,7 +2,7 @@
 export default class HttpCheckStatus {
 
   constructor(isValid) {
-    this.isValid = isValid || (status) => (status < 400)
+    this.isValid = isValid || (status => status < 400)
   }
 
   async intercept(request, next) {

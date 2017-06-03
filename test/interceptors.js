@@ -16,7 +16,7 @@ import {
   HttpLogging,
   HttpRetry,
   HttpTimeout,
-  HttpOnlyOk,
+  HttpCheckStatus,
   HttpThrowPattern
 } from '../src'
 
@@ -115,5 +115,41 @@ describe("HttpTimeout", function() {
 
     await expect(httpTimeout.intercept(null, next)).to.be.rejectedWith(TypeError)
     expect(next.callCount).to.equal(1)
+  })
+})
+
+
+describe("HttpCheckStatus", function() {
+  function createNext(status) {
+    return alwaysResolve({ status })
+  }
+
+  it("accepts (200 < status < 400) by default", async function() {
+    const httpCheckStatus = new HttpCheckStatus()
+
+    const tests = []
+
+    for (let status = 200; status < 400; status++) {
+      await httpCheckStatus.intercept(null, createNext(status))
+    }
+
+    for (let status = 400; status < 600; status++) {
+      const promise = httpCheckStatus.intercept(null, createNext(status))
+      await expect(promise).to.be.rejectedWith(Error)
+    }
+  })
+
+  it("takes a custom accept function", async function() {
+    const accept = sinon.spy(status => status === 1234)
+    const httpCheckStatus = new HttpCheckStatus(accept)
+
+    await httpCheckStatus.intercept(null, createNext(1234))
+    expect(accept.calledWith(1234)).to.be.true
+
+    await expect(
+      httpCheckStatus.intercept(null, createNext(200))
+    ).to.be.rejectedWith(Error)
+
+    expect(accept.calledWith(200)).to.be.true
   })
 })

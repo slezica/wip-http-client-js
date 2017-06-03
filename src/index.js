@@ -2,7 +2,7 @@ export { default as HttpClient } from './HttpClient'
 export { default as HttpLogging } from './HttpLogging'
 export { default as HttpRetry } from './HttpRetry'
 export { default as HttpTimeout } from './HttpTimeout'
-export { default as HttpOnlyOk } from './HttpOnlyOk'
+export { default as HttpCheckStatus } from './HttpCheckStatus'
 export { default as HttpThrowPattern } from './HttpThrowPattern'
 
 

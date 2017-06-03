@@ -156,3 +156,17 @@ reaching a limit of retries, throws the last `Error`.
 - **`constructor(maxRetries)`**
 
     Create an `HttpRetry` that will retry the first `maxRetries` errors.
+
+
+#### HttpCheckStatus
+
+Throws an `Error` if `response.status` does not meet a condition.
+
+- **`constructor(isValid=defaultIsValid)`**
+
+    Create an `HttpCheckStatus` that will call `isValid(status)` and throw if
+    `false` if returned.
+
+    By default, `isValid(status)` will check `status < 400`.
+
+
