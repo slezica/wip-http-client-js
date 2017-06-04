@@ -1,3 +1,6 @@
+_This library is a work in progress_
+
+
 # HttpFlow
 
 Build smart and highly customizable HTTP clients in a few lines of modular,
@@ -170,3 +173,11 @@ Throws an `Error` if `response.status` does not meet a condition.
     By default, `isValid(status)` will check `status < 400`.
 
 
+#### HttpPrefix
+
+Prepend a string to the URL of each request.
+
+- **`constructor(prefix)`**
+
+    Create an `HttpPrefix` that will modify `request.url` in-place by prepending
+    `prefix`.

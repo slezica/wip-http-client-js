@@ -3,6 +3,7 @@ export { default as HttpLogging } from './HttpLogging'
 export { default as HttpRetry } from './HttpRetry'
 export { default as HttpTimeout } from './HttpTimeout'
 export { default as HttpCheckStatus } from './HttpCheckStatus'
+export { default as HttpPrefix } from './HttpPrefix'
 export { default as HttpThrowPattern } from './HttpThrowPattern'
 
 

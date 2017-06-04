@@ -17,6 +17,7 @@ import {
   HttpRetry,
   HttpTimeout,
   HttpCheckStatus,
+  HttpPrefix,
   HttpThrowPattern
 } from '../src'
 
@@ -151,5 +152,19 @@ describe("HttpCheckStatus", function() {
     ).to.be.rejectedWith(Error)
 
     expect(accept.calledWith(200)).to.be.true
+  })
+})
+
+
+describe("HttpPrefix", function() {
+  it("should prepend the prefix to the request URL", async function() {
+    const next = alwaysResolve()
+    const prefix = 'http://example.com'
+    const path = '/hello'
+
+    await new HttpPrefix(prefix).intercept(new Request(path), next)
+
+    expect(next.callCount).to.equal(1)
+    expect(next.args[0][0].url).to.equal(prefix + path)
   })
 })
