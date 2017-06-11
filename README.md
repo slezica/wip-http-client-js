@@ -43,8 +43,8 @@ remains simple and readable:
 ```javascript
 new HttpClient([
   new HttpPrefix('http://example.com/api/v1'),
+  new HttpTimeout(15000),
   new HttpRetry(3),
-  new HttpTimeout(5000),
   new HttpMaxConcurrency(10),
   new HttpProxy('http://myproxy.com')
 ])
@@ -107,7 +107,8 @@ new HttpClient().post('http://example.com/api/v1/hello', {
     Make an HTTP request, invoking `fetch()` and running the `Request` and `Response`
     objects through the middleware chain.
 
-    Errors thrown during request processing will have a non-enumerable `request` property, containing the `Request` object that caused them.
+    Errors thrown during request processing will have a non-enumerable `request`
+    property, containing the `Request` object that caused them.
 
 
 _TODO: utility HttpClient methods_.
