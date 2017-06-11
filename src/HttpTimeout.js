@@ -7,17 +7,21 @@ export default class HttpTimeout {
 
   async intercept(request, next) {
     return new Promise(async (resolve, reject) => {
-      next(request)
-        .then(resolve)
-        .catch(reject)
+      const timeout = setTimeout(reject, this.ms)
+      const cancel = () => clearTimeout(timeout)
 
-      this.sleep(this.ms)
-        .then(_ => new Error(`Request timed out after ${this.ms}ms`))
-        .then(reject)
+      const promise = next(request)
+
+      promise.then(resolve, reject)
+      promise.then(cancel, cancel)
     })
   }
 
   async sleep(ms) {
-    await new Promise(resolve => setTimeout(resolve, ms))
+    let timeout
+    const promise = new Promise(resolve => timeout = setTimeout(resolve, ms))
+    promise.cancel = () => clearTimeout(timeout)
+
+    return promise
   }
 }
